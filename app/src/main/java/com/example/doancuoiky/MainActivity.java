@@ -1,6 +1,7 @@
 package com.example.doancuoiky;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,5 +21,16 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        String role = getIntent().getStringExtra("ROLE");
+        TextView tvWelcome = findViewById(R.id.tvWelcome);
+        
+        if (role != null) {
+            if (role.equals("admin")) {
+                tvWelcome.setText("Welcome Admin!");
+            } else if (role.equals("user")) {
+                tvWelcome.setText("Welcome User!");
+            }
+        }
     }
 }
