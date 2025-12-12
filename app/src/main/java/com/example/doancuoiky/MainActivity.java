@@ -49,8 +49,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.navigation_home) {
                 return true;
+            } else if (itemId == R.id.navigation_profile) {
+                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                return true;
             }
-            // Các item khác (Chat, Profile) xử lý tương tự
             return false;
         });
     }

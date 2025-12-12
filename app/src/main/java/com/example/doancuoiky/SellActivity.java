@@ -24,8 +24,13 @@ public class SellActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.navigation_sell) {
                 return true;
+            } else if (itemId == R.id.navigation_profile) {
+                Intent intent = new Intent(SellActivity.this, ProfileActivity.class);
+                startActivity(intent);
+                finish(); // Đóng SellActivity
+                return true;
             }
-            // Các item khác (Chat, Profile) có thể thêm logic sau
+            // Các item khác (Chat) có thể thêm logic sau
             return false;
         });
     }
