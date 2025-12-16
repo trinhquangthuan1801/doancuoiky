@@ -64,33 +64,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:checkedChip="@+id/chipAll"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/etSearch">
 
         <com.google.android.material.chip.Chip
+            android:id="@+id/chipAll"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All"
+            android:textColor="@color/chip_text_selector"
+            app:chipBackgroundColor="@color/chip_background_selector"/>
+
+        <com.google.android.material.chip.Chip
             android:id="@+id/chipElectronics"
-            style="@style/Widget.MaterialComponents.Chip.Action"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Electronics"
-            app:chipBackgroundColor="#FF00FF"/>
+            android:textColor="@color/chip_text_selector"
+            app:chipBackgroundColor="@color/chip_background_selector"/>
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipClothes"
-            style="@style/Widget.MaterialComponents.Chip.Action"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Personal Items"
-            app:chipBackgroundColor="#FF00FF"/>
+            android:textColor="@color/chip_text_selector"
+            app:chipBackgroundColor="@color/chip_background_selector"/>
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chipBooks"
-            style="@style/Widget.MaterialComponents.Chip.Action"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Books"
-            app:chipBackgroundColor="#FF00FF"/>
+            android:textColor="@color/chip_text_selector"
+            app:chipBackgroundColor="@color/chip_background_selector"/>
     </com.google.android.material.chip.ChipGroup>
 
     <!-- Products Grid -->

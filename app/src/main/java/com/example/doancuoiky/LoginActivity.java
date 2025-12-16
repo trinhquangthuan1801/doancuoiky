@@ -31,11 +31,11 @@ public class LoginActivity extends AppCompatActivity {
             String password = etPassword.getText().toString();
 
             if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(LoginActivity.this, "Please enter username and password", Toast.LENGTH_SHORT).show();
-            } else if (username.equals("admin") && password.equals("admin123")) {
-                loginSuccess("admin");
-            } else if (username.equals("user") && password.equals("user123")) {
-                loginSuccess("user");
+                Toast.makeText(LoginActivity.this, "nhập tài khoản", Toast.LENGTH_SHORT).show();
+            } else if (username.equals("admin") && password.equals("123")) {
+                loginSuccess("admin", username);
+            } else if (username.equals("user") && password.equals("123")) {
+                loginSuccess("user", username);
             } else {
                 Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
             }
@@ -47,10 +47,11 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void loginSuccess(String role) {
+    private void loginSuccess(String role, String username) {
         Toast.makeText(this, "Login successful as " + role, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra("ROLE", role);
+        intent.putExtra("USERNAME", username); // Truyền username sang MainActivity
         startActivity(intent);
         finish();
     }
