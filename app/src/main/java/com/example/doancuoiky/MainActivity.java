@@ -2,11 +2,14 @@ package com.example.doancuoiky;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import java.util.ArrayList;
+import com.google.android.material.chip.ChipGroup;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -14,47 +17,111 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView rvProducts;
     private ProductAdapter productAdapter;
     private List<Product> productList;
+    private DatabaseHelper dbHelper;
+    private ChipGroup chipGroup;
+    private String currentRole; // Lưu role hiện tại
+    private String currentUsername; // Lưu username hiện tại
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Lấy role và username từ Intent
+        currentRole = getIntent().getStringExtra("ROLE");
+        currentUsername = getIntent().getStringExtra("USERNAME");
+
+        // Nếu không có dữ liệu (ví dụ chạy lại app), gán mặc định
+        if (currentRole == null) {
+            currentRole = "user";
+        }
+        if (currentUsername == null) {
+            currentUsername = "guest";
+        }
+
+        // Khởi tạo DatabaseHelper
+        dbHelper = new DatabaseHelper(this);
+        
+        // Tạo dữ liệu mẫu nếu database rỗng (chạy lần đầu)
+        dbHelper.createDefaultDataIfEmpty();
+
         // Khởi tạo RecyclerView
         rvProducts = findViewById(R.id.rvProducts);
         rvProducts.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // Tạo dữ liệu mẫu
-        productList = new ArrayList<>();
-        productList.add(new Product("iPhone 14 Pro Max", "$1750", R.drawable.ic_launcher_background));
-        productList.add(new Product("MacBook Pro 16", "$3400", R.drawable.ic_launcher_background));
-        productList.add(new Product("Áo thun", "$20", R.drawable.ic_launcher_background));
-        productList.add(new Product("Sách Lập trình", "$30", R.drawable.ic_launcher_background));
-        productList.add(new Product("Giày Nike", "$150", R.drawable.ic_launcher_background));
-        productList.add(new Product("Tai nghe Sony", "$250", R.drawable.ic_launcher_background));
+        // Lấy dữ liệu mặc định (tất cả sản phẩm đã duyệt)
+        loadProducts();
 
-        // Thiết lập Adapter
-        productAdapter = new ProductAdapter(productList);
-        rvProducts.setAdapter(productAdapter);
+        // Xử lý ChipGroup (Categories)
+        chipGroup = findViewById(R.id.chipGroup);
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) {
+                loadProducts();
+            } else {
+                int checkedId = checkedIds.get(0);
+                if (checkedId == R.id.chipAll) {
+                    loadProducts();
+                } else if (checkedId == R.id.chipElectronics) {
+                    loadProductsByCategory("Electronics");
+                } else if (checkedId == R.id.chipClothes) {
+                    loadProductsByCategory("Personal Items");
+                } else if (checkedId == R.id.chipBooks) {
+                    loadProductsByCategory("Books");
+                }
+            }
+        });
 
         // Xử lý Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.navigation_home); // Đánh dấu item Home là đang chọn
+        bottomNav.setSelectedItemId(R.id.navigation_home);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_sell) {
                 Intent intent = new Intent(MainActivity.this, SellActivity.class);
+                intent.putExtra("ROLE", currentRole); // Truyền role
+                intent.putExtra("USERNAME", currentUsername); // Truyền username
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.navigation_home) {
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+                intent.putExtra("ROLE", currentRole); // Truyền role
+                intent.putExtra("USERNAME", currentUsername); // Truyền username
                 startActivity(intent);
                 return true;
             }
             return false;
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        List<Integer> checkedIds = chipGroup.getCheckedChipIds();
+        if (checkedIds.isEmpty()) {
+             loadProducts();
+        } else {
+            int checkedId = checkedIds.get(0);
+             if (checkedId == R.id.chipAll) loadProducts();
+             else if (checkedId == R.id.chipElectronics) loadProductsByCategory("Electronics");
+             else if (checkedId == R.id.chipClothes) loadProductsByCategory("Personal Items");
+             else if (checkedId == R.id.chipBooks) loadProductsByCategory("Books");
+        }
+    }
+    private void loadProducts() {
+        // CHỈ HIỆN SẢN PHẨM ĐÃ DUYỆT
+        productList = dbHelper.getAllApprovedProducts();
+        updateAdapter();
+    }
+    private void loadProductsByCategory(String category) {
+        // CHỈ HIỆN SẢN PHẨM ĐÃ DUYỆT THEO DANH MỤC
+        productList = dbHelper.getApprovedProductsByCategory(category);
+        updateAdapter();
+    }
+    private void updateAdapter() {
+        productAdapter = new ProductAdapter(productList);
+        rvProducts.setAdapter(productAdapter);
     }
 }
