@@ -52,6 +52,10 @@
             android:name=".NotificationActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".ChatActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>

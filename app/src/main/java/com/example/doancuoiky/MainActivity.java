@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private ChipGroup chipGroup;
     private String currentRole; 
     private String currentUsername;
-    private ImageView ivNotification; // Thêm icon chuông
+    private ImageView ivNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +92,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.navigation_home) {
+                return true;
+            } else if (itemId == R.id.navigation_chat) { // THÊM XỬ LÝ CHO CHAT
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                startActivity(intent);
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);

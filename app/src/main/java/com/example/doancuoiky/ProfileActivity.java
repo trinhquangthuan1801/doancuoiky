@@ -17,13 +17,18 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        // Lấy role và username
         currentRole = getIntent().getStringExtra("ROLE");
         currentUsername = getIntent().getStringExtra("USERNAME");
+        
         if (currentRole == null) currentRole = "user";
-        if (currentUsername == null) currentUsername = "admin";
+        if (currentUsername == null) currentUsername = "guest";
+
         // Cập nhật tên hiển thị trên Profile
         TextView tvName = findViewById(R.id.tvName);
         tvName.setText(currentUsername);
+
         // Xử lý hiển thị menu Admin
         LinearLayout llApproveProducts = findViewById(R.id.llApproveProducts);
         if ("admin".equals(currentRole)) {
@@ -35,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             llApproveProducts.setVisibility(View.GONE);
         }
+        
         // Xử lý click "Sản phẩm của tôi"
         LinearLayout llMyProducts = findViewById(R.id.llMyProducts);
         llMyProducts.setOnClickListener(v -> {
@@ -42,9 +48,11 @@ public class ProfileActivity extends AppCompatActivity {
             intent.putExtra("USERNAME", currentUsername);
             startActivity(intent);
         });
+
         // Bottom Navigation logic
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setSelectedItemId(R.id.navigation_profile);
+
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_home) {
@@ -61,11 +69,17 @@ public class ProfileActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
                 return true;
+            } else if (itemId == R.id.navigation_chat) { // THÊM XỬ LÝ CHO CHAT
+                Intent intent = new Intent(ProfileActivity.this, ChatActivity.class);
+                startActivity(intent);
+                finish();
+                return true;
             } else if (itemId == R.id.navigation_profile) {
                 return true;
             }
             return false;
         });
+
         // Logout logic
         LinearLayout llLogout = findViewById(R.id.llLogout);
         llLogout.setOnClickListener(v -> {

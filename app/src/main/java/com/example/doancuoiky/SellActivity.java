@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ public class SellActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private String currentRole;
     private String currentUsername;
+    private ImageView ivBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,10 @@ public class SellActivity extends AppCompatActivity {
         
         if (currentRole == null) currentRole = "user";
         if (currentUsername == null) currentUsername = "guest"; // Mặc định nếu lỗi
+
+        // Ánh xạ nút Back và thêm sự kiện
+        ivBack = findViewById(R.id.ivBack);
+        ivBack.setOnClickListener(v -> finish());
 
         dbHelper = new DatabaseHelper(this);
 
@@ -95,6 +101,11 @@ public class SellActivity extends AppCompatActivity {
                 finish();
                 return true;
             } else if (itemId == R.id.navigation_sell) {
+                return true;
+            } else if (itemId == R.id.navigation_chat) { // THÊM XỬ LÝ CHO CHAT
+                Intent intent = new Intent(SellActivity.this, ChatActivity.class);
+                startActivity(intent);
+                finish();
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 Intent intent = new Intent(SellActivity.this, ProfileActivity.class);
