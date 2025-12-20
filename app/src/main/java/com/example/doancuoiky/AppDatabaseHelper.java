@@ -10,7 +10,7 @@ import java.util.List;
 
 public class AppDatabaseHelper extends SQLiteOpenHelper {
 
-    // Tên Database mới (Khác với cái cũ để tránh xung đột)
+    // Tên Database
     private static final String DATABASE_NAME = "DoanCuoiKy.db";
     private static final int DATABASE_VERSION = 1;
 
@@ -44,7 +44,7 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "full_name TEXT, " +
                 "phone TEXT, " +
                 "avatar TEXT, " +
-                "role TEXT DEFAULT 'USER', " +
+                "role TEXT DEFAULT 'USER', " + // ADMIN hoặc USER
                 "created_at TEXT)";
         db.execSQL(createUsers);
 
@@ -62,7 +62,7 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "description TEXT, " +
                 "condition_percentage INTEGER, " +
                 "category_id INTEGER, " +
-                "user_id INTEGER, " +
+                "user_id INTEGER, " + // Quan trọng: Ai là người bán
                 "status INTEGER DEFAULT 0, " + // 0: Chờ duyệt, 1: Hiện, 2: Đã bán
                 "created_at TEXT, " +
                 "FOREIGN KEY(category_id) REFERENCES " + TABLE_CATEGORIES + "(id), " +
@@ -111,9 +111,10 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
                 "UNIQUE(user_id, product_id))";
         db.execSQL(createFavorites);
 
-        // --- TẠO DỮ LIỆU MẪU (MẶC ĐỊNH) ---
+        // --- TẠO DỮ LIỆU MẪU ---
         insertDefaultCategories(db);
-        insertAdminUser(db);
+        insertDefaultUsers(db);    // <-- Đã thêm: Tạo Admin, User1, User2
+        insertDefaultProducts(db); // <-- Đã thêm: Tạo sản phẩm mẫu cho User1, User2
     }
 
     @Override
@@ -128,7 +129,8 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // --- CÁC HÀM HỖ TRỢ KHỞI TẠO ---
+    // --- CÁC HÀM HỖ TRỢ KHỞI TẠO DỮ LIỆU ---
+
     private void insertDefaultCategories(SQLiteDatabase db) {
         String[] categories = {"Điện tử", "Thời trang", "Sách", "Nội thất", "Xe cộ", "Khác"};
         for (String cat : categories) {
@@ -138,22 +140,56 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private void insertAdminUser(SQLiteDatabase db) {
-        ContentValues values = new ContentValues();
-        values.put("email", "admin@gmail.com");
-        values.put("password", "123456"); // Lưu ý: Thực tế nên mã hóa MD5/SHA
-        values.put("full_name", "Administrator");
-        values.put("role", "ADMIN");
-        values.put("created_at", String.valueOf(System.currentTimeMillis()));
-        db.insert(TABLE_USERS, null, values);
+    private void insertDefaultUsers(SQLiteDatabase db) {
+        // 1. ADMIN (ID = 1)
+        ContentValues admin = new ContentValues();
+        admin.put("email", "admin@gmail.com");
+        admin.put("password", "123");
+        admin.put("full_name", "Administrator");
+        admin.put("role", "ADMIN");
+        admin.put("created_at", String.valueOf(System.currentTimeMillis()));
+        db.insert(TABLE_USERS, null, admin);
+
+        // 2. USER 1 (ID = 2) - Người bán iPhone, Xe đạp
+        ContentValues user1 = new ContentValues();
+        user1.put("email", "user1@gmail.com");
+        user1.put("password", "123");
+        user1.put("full_name", "Nguyen Van A");
+        user1.put("role", "USER");
+        user1.put("created_at", String.valueOf(System.currentTimeMillis()));
+        db.insert(TABLE_USERS, null, user1);
+
+        // 3. USER 2 (ID = 3) - Người bán Áo khoác
+        ContentValues user2 = new ContentValues();
+        user2.put("email", "user2@gmail.com");
+        user2.put("password", "123");
+        user2.put("full_name", "Tran Thi B");
+        user2.put("role", "USER");
+        user2.put("created_at", String.valueOf(System.currentTimeMillis()));
+        db.insert(TABLE_USERS, null, user2);
+    }
+
+    private void insertDefaultProducts(SQLiteDatabase db) {
+        String sql = "INSERT INTO " + TABLE_PRODUCTS +
+                " (name, price, description, condition_percentage, category_id, user_id, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        long time = System.currentTimeMillis();
+
+        // Sản phẩm của USER 1 (ID=2)
+        // - iPhone 14 (Đã duyệt)
+        db.execSQL(sql, new Object[]{"iPhone 14 Pro Max", 20000000.0, "Máy còn mới 98%, pin trâu", 98, 1, 2, 1, time});
+        // - Xe đạp (Chờ duyệt - để Admin test chức năng duyệt)
+        db.execSQL(sql, new Object[]{"Xe đạp Martin cũ", 1500000.0, "Xe học sinh, hơi trầy xước", 80, 5, 2, 0, time});
+
+        // Sản phẩm của USER 2 (ID=3)
+        // - Áo khoác (Đã duyệt)
+        db.execSQL(sql, new Object[]{"Áo khoác da", 500000.0, "Hàng xách tay Mỹ", 100, 2, 3, 1, time});
     }
 
     // ===============================================================
-    // DƯỚI ĐÂY LÀ CÁC HÀM MẪU CRUD (THÊM, XEM, SỬA, XÓA)
-    // Tương thích với cấu trúc bảng mới của bạn
+    // CÁC HÀM CRUD CƠ BẢN
     // ===============================================================
 
-    // 1. Đăng ký User mới
+    // 1. Đăng ký
     public long registerUser(String email, String password, String fullName, String phone) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -168,17 +204,14 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    // 2. Check Login
-    public boolean checkLogin(String email, String password) {
+    // 2. Đăng nhập (Sửa lại: Trả về Cursor chứa thông tin User thay vì boolean)
+    // Lý do: Để lấy được ID, Role, FullName sau khi đăng nhập thành công
+    public Cursor getUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE email=? AND password=?", new String[]{email, password});
-        boolean exists = cursor.getCount() > 0;
-        cursor.close();
-        db.close();
-        return exists;
+        return db.rawQuery("SELECT * FROM " + TABLE_USERS + " WHERE email=? AND password=?", new String[]{email, password});
     }
 
-    // 3. Thêm sản phẩm mới (Lưu ý: chưa lưu ảnh ở hàm này, ảnh lưu bảng riêng)
+    // 3. Thêm sản phẩm (Dành cho chức năng "Đăng bán")
     public long addProduct(String name, double price, String desc, int condition, int categoryId, int userId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -188,7 +221,7 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         values.put("condition_percentage", condition);
         values.put("category_id", categoryId);
         values.put("user_id", userId);
-        values.put("status", 0); // Mặc định là 0: Chờ duyệt
+        values.put("status", 0); // Mặc định là Chờ duyệt (0)
         values.put("created_at", String.valueOf(System.currentTimeMillis()));
 
         long productId = db.insert(TABLE_PRODUCTS, null, values);
@@ -196,50 +229,35 @@ public class AppDatabaseHelper extends SQLiteOpenHelper {
         return productId;
     }
 
-    // 4. Thêm ảnh cho sản phẩm
-    public void addProductImage(long productId, String imageUri) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("product_id", productId);
-        values.put("image_uri", imageUri);
-        db.insert(TABLE_PRODUCT_IMAGES, null, values);
-        db.close();
-    }
-
-    // 5. Lấy danh sách sản phẩm ĐÃ DUYỆT (status = 1) để hiển thị trang chủ
+    // 4. Lấy danh sách sản phẩm hiển thị trang chủ (Chỉ lấy status = 1)
+    // Có join bảng User để lấy tên người bán
     public Cursor getAllActiveProducts() {
         SQLiteDatabase db = this.getReadableDatabase();
-        // Query nối bảng để lấy tên danh mục và tên người bán nếu cần
         String query = "SELECT p.*, c.name as category_name, u.full_name as seller_name " +
                 "FROM " + TABLE_PRODUCTS + " p " +
-                "LEFT JOIN " + TABLE_CATEGORIES + " c ON p.category_id = c.id " +
-                "LEFT JOIN " + TABLE_USERS + " u ON p.user_id = u.id " +
+                "JOIN " + TABLE_CATEGORIES + " c ON p.category_id = c.id " +
+                "JOIN " + TABLE_USERS + " u ON p.user_id = u.id " +
                 "WHERE p.status = 1 " +
                 "ORDER BY p.id DESC";
         return db.rawQuery(query, null);
     }
 
-    // 6. Lấy danh sách ảnh của 1 sản phẩm
-    public List<String> getProductImages(int productId) {
-        List<String> images = new ArrayList<>();
+    // 5. Admin: Lấy danh sách sản phẩm CHỜ DUYỆT (status = 0)
+    public Cursor getPendingProducts() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT image_uri FROM " + TABLE_PRODUCT_IMAGES + " WHERE product_id=?",
-                new String[]{String.valueOf(productId)});
-        if (cursor.moveToFirst()) {
-            do {
-                images.add(cursor.getString(0));
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
-        return images;
+        String query = "SELECT p.*, u.full_name as seller_name " +
+                "FROM " + TABLE_PRODUCTS + " p " +
+                "JOIN " + TABLE_USERS + " u ON p.user_id = u.id " +
+                "WHERE p.status = 0 " +
+                "ORDER BY p.created_at ASC";
+        return db.rawQuery(query, null);
     }
 
-    // 7. Admin duyệt sản phẩm (Đổi status từ 0 -> 1)
+    // 6. Admin: Duyệt sản phẩm
     public void approveProduct(int productId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("status", 1); // 1: Approved
+        values.put("status", 1); // 1: Đã duyệt
         db.update(TABLE_PRODUCTS, values, "id=?", new String[]{String.valueOf(productId)});
         db.close();
     }
