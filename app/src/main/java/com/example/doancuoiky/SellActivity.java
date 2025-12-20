@@ -62,8 +62,8 @@ public class SellActivity extends AppCompatActivity {
                     status = "approved";
                 }
 
-                // Lưu sản phẩm kèm owner
-                Product newProduct = new Product(name, price, R.drawable.ic_image_placeholder, category, status, currentUsername);
+                // Lưu sản phẩm kèm owner và quantity mặc định là 10
+                Product newProduct = new Product(name, price, R.drawable.ic_image_placeholder, category, status, currentUsername, 10);
                 dbHelper.addProduct(newProduct);
 
                 if ("approved".equals(status)) {

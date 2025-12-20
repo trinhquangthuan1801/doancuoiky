@@ -1,5 +1,7 @@
 package com.example.doancuoiky;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import java.util.List;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
     private List<Product> productList;
+    private Context context;
 
     public ProductAdapter(List<Product> productList) {
         this.productList = productList;
@@ -20,16 +23,29 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.product_item, parent, false);
+        context = parent.getContext();
+        View view = LayoutInflater.from(context).inflate(R.layout.product_item, parent, false);
         return new ProductViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
+        
         holder.tvProductName.setText(product.getName());
         holder.tvProductPrice.setText(product.getPrice());
         holder.ivProductImage.setImageResource(product.getImageResource());
+
+        // Sự kiện click vào một item
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ProductDetailActivity.class);
+            intent.putExtra("NAME", product.getName());
+            intent.putExtra("PRICE", product.getPrice());
+            intent.putExtra("IMAGE", product.getImageResource());
+            intent.putExtra("CATEGORY", product.getCategory());
+            intent.putExtra("QUANTITY", product.getQuantity());
+            context.startActivity(intent);
+        });
     }
 
     @Override

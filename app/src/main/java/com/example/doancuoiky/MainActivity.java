@@ -3,6 +3,7 @@ package com.example.doancuoiky;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -19,8 +20,9 @@ public class MainActivity extends AppCompatActivity {
     private List<Product> productList;
     private DatabaseHelper dbHelper;
     private ChipGroup chipGroup;
-    private String currentRole; // Lưu role hiện tại
-    private String currentUsername; // Lưu username hiện tại
+    private String currentRole; 
+    private String currentUsername;
+    private ImageView ivNotification; // Thêm icon chuông
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +33,19 @@ public class MainActivity extends AppCompatActivity {
         currentRole = getIntent().getStringExtra("ROLE");
         currentUsername = getIntent().getStringExtra("USERNAME");
 
-        // Nếu không có dữ liệu (ví dụ chạy lại app), gán mặc định
         if (currentRole == null) {
             currentRole = "user";
         }
         if (currentUsername == null) {
             currentUsername = "guest";
         }
+
+        // Ánh xạ icon chuông và cài đặt sự kiện click
+        ivNotification = findViewById(R.id.ivNotification);
+        ivNotification.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+            startActivity(intent);
+        });
 
         // Khởi tạo DatabaseHelper
         dbHelper = new DatabaseHelper(this);
@@ -79,16 +87,16 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_sell) {
                 Intent intent = new Intent(MainActivity.this, SellActivity.class);
-                intent.putExtra("ROLE", currentRole); // Truyền role
-                intent.putExtra("USERNAME", currentUsername); // Truyền username
+                intent.putExtra("ROLE", currentRole); 
+                intent.putExtra("USERNAME", currentUsername);
                 startActivity(intent);
                 return true;
             } else if (itemId == R.id.navigation_home) {
                 return true;
             } else if (itemId == R.id.navigation_profile) {
                 Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                intent.putExtra("ROLE", currentRole); // Truyền role
-                intent.putExtra("USERNAME", currentUsername); // Truyền username
+                intent.putExtra("ROLE", currentRole); 
+                intent.putExtra("USERNAME", currentUsername); 
                 startActivity(intent);
                 return true;
             }
@@ -110,16 +118,17 @@ public class MainActivity extends AppCompatActivity {
              else if (checkedId == R.id.chipBooks) loadProductsByCategory("Books");
         }
     }
+
     private void loadProducts() {
-        // CHỈ HIỆN SẢN PHẨM ĐÃ DUYỆT
         productList = dbHelper.getAllApprovedProducts();
         updateAdapter();
     }
+
     private void loadProductsByCategory(String category) {
-        // CHỈ HIỆN SẢN PHẨM ĐÃ DUYỆT THEO DANH MỤC
         productList = dbHelper.getApprovedProductsByCategory(category);
         updateAdapter();
     }
+
     private void updateAdapter() {
         productAdapter = new ProductAdapter(productList);
         rvProducts.setAdapter(productAdapter);
