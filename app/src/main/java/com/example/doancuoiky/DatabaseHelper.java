@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ProductManager.db";
-    private static final int DATABASE_VERSION = 4; // Tăng version lên 4
+    private static final int DATABASE_VERSION = 5; // Tăng version lên 5
     private static final String TABLE_PRODUCTS = "products";
 
     private static final String COLUMN_ID = "id";
@@ -20,7 +20,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_IMAGE = "image_resource";
     private static final String COLUMN_CATEGORY = "category";
     private static final String COLUMN_STATUS = "status";
-    private static final String COLUMN_OWNER = "owner"; // Cột mới
+    private static final String COLUMN_OWNER = "owner";
+    private static final String COLUMN_QUANTITY = "quantity"; // Cột mới
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -35,7 +36,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_IMAGE + " INTEGER, " +
                 COLUMN_CATEGORY + " TEXT, " +
                 COLUMN_STATUS + " TEXT, " +
-                COLUMN_OWNER + " TEXT)"; // Thêm cột owner
+                COLUMN_OWNER + " TEXT, " +
+                COLUMN_QUANTITY + " INTEGER)"; // Thêm cột quantity
         db.execSQL(createTable);
     }
 
@@ -56,10 +58,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IMAGE, product.getImageResource());
         values.put(COLUMN_CATEGORY, product.getCategory());
         values.put(COLUMN_STATUS, product.getStatus());
-        values.put(COLUMN_OWNER, product.getOwner()); // Lưu owner
+        values.put(COLUMN_OWNER, product.getOwner());
+        values.put(COLUMN_QUANTITY, product.getQuantity()); // Lưu quantity
 
         db.insert(TABLE_PRODUCTS, null, values);
         db.close();
+    }
+
+    // Helper method to extract product from cursor
+    private Product extractProduct(Cursor cursor) {
+        int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+        String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
+        String price = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
+        int imageRes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+        String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
+        String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
+        String owner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OWNER));
+        int quantity = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_QUANTITY));
+
+        return new Product(id, name, price, imageRes, category, status, owner, quantity);
     }
 
     // Lấy sản phẩm của một người dùng cụ thể
@@ -72,15 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
-                String price = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
-                int imageRes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
-                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
-                String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
-                String owner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OWNER));
-
-                productList.add(new Product(id, name, price, imageRes, category, status, owner));
+                productList.add(extractProduct(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -98,15 +107,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
-                String price = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
-                int imageRes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
-                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
-                String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
-                String owner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OWNER));
-
-                productList.add(new Product(id, name, price, imageRes, category, status, owner));
+                productList.add(extractProduct(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -124,15 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
-                String price = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
-                int imageRes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
-                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
-                String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
-                String owner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OWNER));
-
-                productList.add(new Product(id, name, price, imageRes, category, status, owner));
+                productList.add(extractProduct(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -167,15 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
-                String price = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
-                int imageRes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
-                String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
-                String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
-                String owner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OWNER));
-
-                productList.add(new Product(id, name, price, imageRes, category, status, owner));
+                productList.add(extractProduct(cursor));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -185,12 +170,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void createDefaultDataIfEmpty() {
         if (getAllApprovedProducts().isEmpty()) {
-            addProduct(new Product("iPhone 14", "$999", R.drawable.ic_launcher_background, "Electronics", "approved", "admin"));
-            addProduct(new Product("Áo thun", "$20", R.drawable.ic_launcher_background, "Personal Items", "approved", "admin"));
-            addProduct(new Product("Sách Java", "$30", R.drawable.ic_launcher_background, "Books", "approved", "admin"));
-            addProduct(new Product("MacBook Pro", "$2000", R.drawable.ic_launcher_background, "Electronics", "approved", "admin"));
-            addProduct(new Product("Giày Nike", "$100", R.drawable.ic_launcher_background, "Personal Items", "approved", "admin"));
-            addProduct(new Product("Truyện Harry Potter", "$15", R.drawable.ic_launcher_background, "Books", "approved", "admin"));
+            addProduct(new Product("iPhone 14", "$999", R.drawable.ic_launcher_background, "Electronics", "approved", "admin", 10));
+            addProduct(new Product("Áo thun", "$20", R.drawable.ic_launcher_background, "Personal Items", "approved", "admin", 10));
+            addProduct(new Product("Sách Java", "$30", R.drawable.ic_launcher_background, "Books", "approved", "admin", 10));
+            addProduct(new Product("MacBook Pro", "$2000", R.drawable.ic_launcher_background, "Electronics", "approved", "admin", 10));
+            addProduct(new Product("Giày Nike", "$100", R.drawable.ic_launcher_background, "Personal Items", "approved", "admin", 10));
+            addProduct(new Product("Truyện Harry Potter", "$15", R.drawable.ic_launcher_background, "Books", "approved", "admin", 10));
         }
     }
 }

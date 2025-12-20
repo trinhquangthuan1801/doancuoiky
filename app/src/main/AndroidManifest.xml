@@ -44,6 +44,14 @@
             android:name=".MyProductsActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".ProductDetailActivity"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".NotificationActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>
