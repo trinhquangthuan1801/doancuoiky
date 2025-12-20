@@ -84,12 +84,53 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="24dp"
                 android:background="@drawable/edit_text_background"
-                android:hint="Giá"
+                android:hint="Giá (VND)"
                 android:inputType="numberDecimal"
                 android:padding="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/etDescription" />
+
+            <!-- START: Thêm trường Tình trạng sản phẩm -->
+            <TextView
+                android:id="@+id/tvConditionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Tình trạng sản phẩm"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/etPrice" />
+
+            <SeekBar
+                android:id="@+id/sbCondition"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:max="100"
+                android:progress="100"
+                app:layout_constraintEnd_toStartOf="@+id/tvConditionPercentage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvConditionLabel" />
+
+            <TextView
+                android:id="@+id/tvConditionPercentage"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:gravity="end"
+                android:text="100%"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/sbCondition"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/sbCondition" />
+            <!-- END: Thêm trường Tình trạng sản phẩm -->
 
             <ImageView
                 android:id="@+id/ivImagePreview"
@@ -101,7 +142,7 @@
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_image_placeholder"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/etPrice" />
+                app:layout_constraintTop_toBottomOf="@id/sbCondition" /> <!-- Sửa constraint ở đây -->
 
             <Button
                 android:id="@+id/btnSelectImage"
@@ -131,7 +172,7 @@
                 app:cornerRadius="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ivImagePreview" />
+                app:layout_constraintTop_toBottomOf="@id/ivImagePreview" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

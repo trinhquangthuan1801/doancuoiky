@@ -1,65 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:cardCornerRadius="8dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/iv_pending_product_image"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
         <TextView
-            android:id="@+id/tvPendingName"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_pending_product_name"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Tên sản phẩm"
+            android:layout_marginStart="12dp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textAppearance="?attr/textAppearanceHeadline6"
             android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/iv_pending_product_image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Tên sản phẩm đang chờ duyệt" />
+
+        <TextView
+            android:id="@+id/tv_pending_product_price"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:textColor="?attr/colorPrimary"
             android:textStyle="bold"
-            android:textColor="#000000"/>
+            app:layout_constraintStart_toStartOf="@+id/tv_pending_product_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pending_product_name"
+            tools:text="3.000.000 ₫" />
 
         <TextView
-            android:id="@+id/tvPendingPrice"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_pending_product_seller"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Giá: $100"
-            android:layout_marginTop="4dp"/>
+            android:textAppearance="?attr/textAppearanceBody2"
+            app:layout_constraintStart_toStartOf="@+id/tv_pending_product_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pending_product_price"
+            tools:text="Người bán: User Test" />
 
         <TextView
-            android:id="@+id/tvPendingCategory"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_pending_product_condition"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Category: Electronics"
-            android:layout_marginTop="4dp"/>
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textStyle="italic"
+            app:layout_constraintStart_toStartOf="@+id/tv_pending_product_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_pending_product_seller"
+            tools:text="Tình trạng: 95%" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="12dp"
-            android:gravity="end">
+            android:gravity="end"
+            app:layout_constraintTop_toBottomOf="@+id/iv_pending_product_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
-            <Button
-                android:id="@+id/btnReject"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_reject"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Từ chối"
-                android:backgroundTint="#FF0000"
-                android:textColor="#FFFFFF"
+                android:textColor="@android:color/holo_red_dark"
+                app:strokeColor="@android:color/holo_red_dark"
                 android:layout_marginEnd="8dp"/>
 
-            <Button
-                android:id="@+id/btnApprove"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_approve"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Duyệt"
-                android:backgroundTint="#4CAF50"
-                android:textColor="#FFFFFF"/>
+                app:icon="@drawable/ic_check"/>
         </LinearLayout>
 
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
