@@ -90,8 +90,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // ... (các hàm khác giữ nguyên, không thay đổi) ...
-
     public void addProduct(Product product) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -135,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Product> getAllApprovedProducts() {
         List<Product> productList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = 'approved'";
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = \'approved\'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -150,7 +148,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Product> getPendingProducts() {
         List<Product> productList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = 'pending'";
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = \'pending\'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -177,9 +175,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Cập nhật trạng thái của một sản phẩm thành "đã bán".
+     * @param productId ID của sản phẩm cần cập nhật.
+     */
+    public void markProductAsSold(int productId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_STATUS, "sold");
+        db.update(TABLE_PRODUCTS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(productId)});
+        db.close();
+    }
+
+    /**
+     * Thêm một đơn hàng mới vào bảng orders.
+     */
+    public void addOrder(int productId, String buyerUsername, String sellerUsername, String price, String date, String address, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ORDER_PRODUCT_ID, productId);
+        values.put(COLUMN_ORDER_BUYER_USERNAME, buyerUsername);
+        values.put(COLUMN_ORDER_SELLER_USERNAME, sellerUsername);
+        values.put(COLUMN_ORDER_PURCHASE_PRICE, price);
+        values.put(COLUMN_ORDER_DATE, date);
+        values.put(COLUMN_ORDER_SHIPPING_ADDRESS, address);
+        values.put(COLUMN_ORDER_CONTACT_PHONE, phone);
+        db.insert(TABLE_ORDERS, null, values);
+        db.close();
+    }
+
     public List<Product> getApprovedProductsByCategory(String categoryFilter) {
         List<Product> productList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_CATEGORY + " = ? AND " + COLUMN_STATUS + " = 'approved'";
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_CATEGORY + " = ? AND " + COLUMN_STATUS + " = \'approved\'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, new String[]{categoryFilter});
         if (cursor.moveToFirst()) {

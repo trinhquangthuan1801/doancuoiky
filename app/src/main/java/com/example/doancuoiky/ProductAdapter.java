@@ -36,9 +36,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.tvProductName.setText(product.getName());
         holder.tvProductPrice.setText(product.getPrice());
 
-        // Dùng Glide để hiển thị ảnh từ đường dẫn
         Glide.with(context)
-                .load(product.getImagePath()) // Lấy đường dẫn ảnh (String)
+                .load(product.getImagePath())
                 .placeholder(R.drawable.ic_image_placeholder)
                 .into(holder.ivProductImage);
 
@@ -46,10 +45,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ProductDetailActivity.class);
 
-            // Truyền dữ liệu mới và đầy đủ
+            // --- GỬI ĐẦY ĐỦ DỮ LIỆU SANG PRODUCT DETAIL ---
+            intent.putExtra("PRODUCT_ID", product.getId()); // GỬI THÊM ID
             intent.putExtra("PRODUCT_NAME", product.getName());
             intent.putExtra("PRODUCT_PRICE", product.getPrice());
-            intent.putExtra("PRODUCT_IMAGE_PATH", product.getImagePath()); // Đường dẫn ảnh
+            intent.putExtra("PRODUCT_IMAGE_PATH", product.getImagePath());
             intent.putExtra("PRODUCT_CATEGORY", product.getCategory());
             intent.putExtra("PRODUCT_OWNER", product.getOwner());
             intent.putExtra("PRODUCT_DESCRIPTION", product.getDescription());
