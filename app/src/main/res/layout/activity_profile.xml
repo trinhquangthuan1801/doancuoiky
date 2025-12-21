@@ -61,7 +61,6 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <!-- Following -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -85,7 +84,6 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <!-- Followers -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -128,7 +126,7 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp">
 
-                <!-- Item Admin: Duyệt sản phẩm (Mặc định ẩn) -->
+                <!-- Item Admin: Duyệt sản phẩm -->
                 <LinearLayout
                     android:id="@+id/llApproveProducts"
                     android:layout_width="match_parent"
@@ -136,7 +134,8 @@
                     android:gravity="center_vertical"
                     android:paddingTop="16dp"
                     android:paddingBottom="16dp"
-                    android:visibility="gone">
+                    android:visibility="gone" 
+                    tools:visibility="visible">
 
                     <ImageView
                         android:layout_width="40dp"
@@ -155,9 +154,9 @@
                         android:textSize="16sp"/>
                 </LinearLayout>
 
-                <!-- Item 1: Đơn hàng -->
+                <!-- Item 1: Lịch sử mua hàng -->
                 <LinearLayout
-                    android:id="@+id/llOrder"
+                    android:id="@+id/llPurchaseHistory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -176,14 +175,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Đơn hàng của tôi"
+                        android:text="Lịch sử mua hàng"
                         android:textColor="#333333"
                         android:textSize="16sp" />
                 </LinearLayout>
 
-                <!-- Item 2: Chỉnh sửa hồ sơ -->
+                <!-- Item 2: Lịch sử bán hàng -->
                 <LinearLayout
-                    android:id="@+id/llEditProfile"
+                    android:id="@+id/llSalesHistory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -195,14 +194,14 @@
                         android:layout_height="40dp"
                         android:background="@drawable/circle_background"
                         android:padding="8dp"
-                        android:src="@drawable/ic_edit_profile"
+                        android:src="@drawable/ic_my_product" 
                         app:tint="#A0A0A0" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="Chỉnh sửa hồ sơ"
+                        android:text="Lịch sử bán hàng"
                         android:textColor="#333333"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -232,8 +231,34 @@
                         android:textColor="#333333"
                         android:textSize="16sp" />
                 </LinearLayout>
+                
+                <!-- Item 4: Chỉnh sửa hồ sơ (đã dời xuống) -->
+                <LinearLayout
+                    android:id="@+id/llEditProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
-                <!-- Item 4: Đăng xuất -->
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_background"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_edit_profile"
+                        app:tint="#A0A0A0" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:text="Chỉnh sửa hồ sơ"
+                        android:textColor="#333333"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <!-- Item 5: Đăng xuất -->
                 <LinearLayout
                     android:id="@+id/llLogout"
                     android:layout_width="match_parent"

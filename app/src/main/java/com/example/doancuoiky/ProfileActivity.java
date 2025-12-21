@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -19,12 +20,11 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // --- LẤY DỮ LIỆU TỪ SHAREDPREFERENCES ---
+        // LẤY DỮ LIỆU TỪ SHAREDPREFERENCES
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
         currentRole = prefs.getString("user_role", "user");
         currentUsername = prefs.getString("user_name", "guest");
 
-        // Cập nhật tên hiển thị trên Profile
         TextView tvName = findViewById(R.id.tvName);
         tvName.setText(currentUsername);
 
@@ -40,15 +40,30 @@ public class ProfileActivity extends AppCompatActivity {
             llApproveProducts.setVisibility(View.GONE);
         }
 
-        // Xử lý click "Sản phẩm của tôi"
+        // --- XỬ LÝ SỰ KIỆN CHO CÁC MỤC MỚI ---
+
+        // 1. Lịch sử mua hàng
+        LinearLayout llPurchaseHistory = findViewById(R.id.llPurchaseHistory);
+        llPurchaseHistory.setOnClickListener(v -> {
+            // TODO: Mở màn hình Lịch sử mua hàng sau khi tạo
+            Toast.makeText(ProfileActivity.this, "Chức năng Lịch sử mua hàng đang phát triển!", Toast.LENGTH_SHORT).show();
+        });
+
+        // 2. Lịch sử bán hàng
+        LinearLayout llSalesHistory = findViewById(R.id.llSalesHistory);
+        llSalesHistory.setOnClickListener(v -> {
+            // TODO: Mở màn hình Lịch sử bán hàng sau khi tạo
+            Toast.makeText(ProfileActivity.this, "Chức năng Lịch sử bán hàng đang phát triển!", Toast.LENGTH_SHORT).show();
+        });
+
+        // 3. Sản phẩm của tôi
         LinearLayout llMyProducts = findViewById(R.id.llMyProducts);
         llMyProducts.setOnClickListener(v -> {
-            // MyProductsActivity giờ đã tự lấy username, không cần truyền qua Intent nữa
             Intent intent = new Intent(ProfileActivity.this, MyProductsActivity.class);
             startActivity(intent);
         });
 
-        // Bottom Navigation logic (đã được dọn dẹp)
+        // Bottom Navigation logic
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setSelectedItemId(R.id.navigation_profile);
 
@@ -75,7 +90,6 @@ public class ProfileActivity extends AppCompatActivity {
         // Logout logic
         LinearLayout llLogout = findViewById(R.id.llLogout);
         llLogout.setOnClickListener(v -> {
-            // Xóa SharedPreferences khi đăng xuất
             SharedPreferences.Editor editor = prefs.edit();
             editor.clear();
             editor.apply();

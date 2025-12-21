@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ProductManager.db";
-    private static final int DATABASE_VERSION = 6; // Đặt lại phiên bản thành 6
+    private static final int DATABASE_VERSION = 7; // Tăng phiên bản để thêm bảng orders
 
     // === Bảng Products ===
     private static final String TABLE_PRODUCTS = "products";
@@ -30,12 +30,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_CART_USER_NAME = "user_name";
     private static final String COLUMN_CART_PRODUCT_ID = "product_id";
 
+    // === Bảng Orders (Đơn hàng) - BẢNG MỚI ===
+    private static final String TABLE_ORDERS = "orders";
+    private static final String COLUMN_ORDER_ID = "order_id";
+    private static final String COLUMN_ORDER_PRODUCT_ID = "product_id";
+    private static final String COLUMN_ORDER_BUYER_USERNAME = "buyer_username";
+    private static final String COLUMN_ORDER_SELLER_USERNAME = "seller_username";
+    private static final String COLUMN_ORDER_PURCHASE_PRICE = "purchase_price";
+    private static final String COLUMN_ORDER_DATE = "order_date";
+    private static final String COLUMN_ORDER_SHIPPING_ADDRESS = "shipping_address";
+    private static final String COLUMN_ORDER_CONTACT_PHONE = "contact_phone";
+
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // 1. Tạo bảng Products
         String createProductsTable = "CREATE TABLE " + TABLE_PRODUCTS + " (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NAME + " TEXT, " +
@@ -47,18 +60,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_DESCRIPTION + " TEXT)";
         db.execSQL(createProductsTable);
 
+        // 2. Tạo bảng Cart
         String createCartTable = "CREATE TABLE " + TABLE_CART + " (" +
                 COLUMN_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_CART_USER_NAME + " TEXT, " +
                 COLUMN_CART_PRODUCT_ID + " INTEGER, " +
                 "FOREIGN KEY(" + COLUMN_CART_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_ID + "))";
         db.execSQL(createCartTable);
+
+        // 3. Tạo bảng Orders (MỚI)
+        String createOrdersTable = "CREATE TABLE " + TABLE_ORDERS + " (" +
+                COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_ORDER_PRODUCT_ID + " INTEGER, " +
+                COLUMN_ORDER_BUYER_USERNAME + " TEXT, " +
+                COLUMN_ORDER_SELLER_USERNAME + " TEXT, " +
+                COLUMN_ORDER_PURCHASE_PRICE + " TEXT, " +
+                COLUMN_ORDER_DATE + " TEXT, " +
+                COLUMN_ORDER_SHIPPING_ADDRESS + " TEXT, " +
+                COLUMN_ORDER_CONTACT_PHONE + " TEXT, " +
+                "FOREIGN KEY(" + COLUMN_ORDER_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_ID + "))";
+        db.execSQL(createOrdersTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDERS); // Xóa cả bảng orders nếu tồn tại
         onCreate(db);
     }
 
@@ -105,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Product> getAllApprovedProducts() {
         List<Product> productList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = 'approved'";
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = \'approved\'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -120,7 +148,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public List<Product> getPendingProducts() {
         List<Product> productList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = 'pending'";
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = \'pending\'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -147,9 +175,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Cập nhật trạng thái của một sản phẩm thành "đã bán".
+     * @param productId ID của sản phẩm cần cập nhật.
+     */
+    public void markProductAsSold(int productId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_STATUS, "sold");
+        db.update(TABLE_PRODUCTS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(productId)});
+        db.close();
+    }
+
+    /**
+     * Thêm một đơn hàng mới vào bảng orders.
+     */
+    public void addOrder(int productId, String buyerUsername, String sellerUsername, String price, String date, String address, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ORDER_PRODUCT_ID, productId);
+        values.put(COLUMN_ORDER_BUYER_USERNAME, buyerUsername);
+        values.put(COLUMN_ORDER_SELLER_USERNAME, sellerUsername);
+        values.put(COLUMN_ORDER_PURCHASE_PRICE, price);
+        values.put(COLUMN_ORDER_DATE, date);
+        values.put(COLUMN_ORDER_SHIPPING_ADDRESS, address);
+        values.put(COLUMN_ORDER_CONTACT_PHONE, phone);
+        db.insert(TABLE_ORDERS, null, values);
+        db.close();
+    }
+
     public List<Product> getApprovedProductsByCategory(String categoryFilter) {
         List<Product> productList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_CATEGORY + " = ? AND " + COLUMN_STATUS + " = 'approved'";
+        String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_CATEGORY + " = ? AND " + COLUMN_STATUS + " = \'approved\'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, new String[]{categoryFilter});
         if (cursor.moveToFirst()) {

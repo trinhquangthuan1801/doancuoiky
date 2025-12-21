@@ -36,7 +36,7 @@ public class MyProductAdapter extends RecyclerView.Adapter<MyProductAdapter.MyPr
         holder.tvName.setText(product.getName());
         holder.tvPrice.setText("Giá: " + product.getPrice());
         holder.tvCategory.setText("Loại: " + product.getCategory());
-        holder.tvDescription.setText(product.getDescription()); // Hiển thị mô tả
+        holder.tvDescription.setText(product.getDescription());
 
         // Dùng Glide để hiển thị ảnh
         Glide.with(context)
@@ -44,17 +44,25 @@ public class MyProductAdapter extends RecyclerView.Adapter<MyProductAdapter.MyPr
                 .placeholder(R.drawable.ic_image_placeholder)
                 .into(holder.ivProduct);
 
-        // Hiển thị trạng thái và đổi màu
+        // --- NÂNG CẤP LOGIC HIỂN THỊ TRẠNG THÁI ---
         String status = product.getStatus();
-        if ("approved".equals(status)) {
-            holder.tvStatus.setText("Đã duyệt");
-            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Màu xanh
-        } else {
-            holder.tvStatus.setText("Chờ duyệt");
-            holder.tvStatus.setTextColor(Color.parseColor("#FF9800")); // Màu cam
+        switch (status) {
+            case "approved":
+                holder.tvStatus.setText("Đã duyệt");
+                holder.tvStatus.setTextColor(Color.parseColor("#4CAF50")); // Xanh lá
+                break;
+            case "sold":
+                holder.tvStatus.setText("Đã bán");
+                holder.tvStatus.setTextColor(Color.parseColor("#808080")); // Xám
+                break;
+            case "pending":
+            default:
+                holder.tvStatus.setText("Chờ duyệt");
+                holder.tvStatus.setTextColor(Color.parseColor("#FF9800")); // Cam
+                break;
         }
 
-        // Thêm sự kiện click để xem chi tiết
+        // Sự kiện click để xem chi tiết
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ProductDetailActivity.class);
             intent.putExtra("PRODUCT_NAME", product.getName());
