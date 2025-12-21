@@ -11,17 +11,24 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ProductManager.db";
-    private static final int DATABASE_VERSION = 5; // Tăng version lên 5
-    private static final String TABLE_PRODUCTS = "products";
+    private static final int DATABASE_VERSION = 6; // Đặt lại phiên bản thành 6
 
+    // === Bảng Products ===
+    private static final String TABLE_PRODUCTS = "products";
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_NAME = "name";
     private static final String COLUMN_PRICE = "price";
-    private static final String COLUMN_IMAGE = "image_resource";
+    private static final String COLUMN_IMAGE = "image_path";
     private static final String COLUMN_CATEGORY = "category";
     private static final String COLUMN_STATUS = "status";
     private static final String COLUMN_OWNER = "owner";
-    private static final String COLUMN_QUANTITY = "quantity"; // Cột mới
+    private static final String COLUMN_DESCRIPTION = "description";
+
+    // === Bảng Cart (Giỏ hàng) ===
+    private static final String TABLE_CART = "cart_items";
+    private static final String COLUMN_CART_ID = "cart_item_id";
+    private static final String COLUMN_CART_USER_NAME = "user_name";
+    private static final String COLUMN_CART_PRODUCT_ID = "product_id";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,64 +36,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE_PRODUCTS + " (" +
+        String createProductsTable = "CREATE TABLE " + TABLE_PRODUCTS + " (" +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_NAME + " TEXT, " +
                 COLUMN_PRICE + " TEXT, " +
-                COLUMN_IMAGE + " INTEGER, " +
+                COLUMN_IMAGE + " TEXT, " +
                 COLUMN_CATEGORY + " TEXT, " +
                 COLUMN_STATUS + " TEXT, " +
                 COLUMN_OWNER + " TEXT, " +
-                COLUMN_QUANTITY + " INTEGER)"; // Thêm cột quantity
-        db.execSQL(createTable);
+                COLUMN_DESCRIPTION + " TEXT)";
+        db.execSQL(createProductsTable);
+
+        String createCartTable = "CREATE TABLE " + TABLE_CART + " (" +
+                COLUMN_CART_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_CART_USER_NAME + " TEXT, " +
+                COLUMN_CART_PRODUCT_ID + " INTEGER, " +
+                "FOREIGN KEY(" + COLUMN_CART_PRODUCT_ID + ") REFERENCES " + TABLE_PRODUCTS + "(" + COLUMN_ID + "))";
+        db.execSQL(createCartTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CART);
         onCreate(db);
     }
-
-    // --- CÁC HÀM XỬ LÝ DỮ LIỆU ---
 
     public void addProduct(Product product) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-
         values.put(COLUMN_NAME, product.getName());
         values.put(COLUMN_PRICE, product.getPrice());
-        values.put(COLUMN_IMAGE, product.getImageResource());
+        values.put(COLUMN_IMAGE, product.getImagePath());
         values.put(COLUMN_CATEGORY, product.getCategory());
         values.put(COLUMN_STATUS, product.getStatus());
         values.put(COLUMN_OWNER, product.getOwner());
-        values.put(COLUMN_QUANTITY, product.getQuantity()); // Lưu quantity
-
+        values.put(COLUMN_DESCRIPTION, product.getDescription());
         db.insert(TABLE_PRODUCTS, null, values);
         db.close();
     }
 
-    // Helper method to extract product from cursor
     private Product extractProduct(Cursor cursor) {
         int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
         String price = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PRICE));
-        int imageRes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+        String imagePath = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
         String category = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY));
         String status = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STATUS));
         String owner = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_OWNER));
-        int quantity = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_QUANTITY));
-
-        return new Product(id, name, price, imageRes, category, status, owner, quantity);
+        String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
+        return new Product(id, name, price, imagePath, category, status, owner, description);
     }
 
-    // Lấy sản phẩm của một người dùng cụ thể
     public List<Product> getProductsByOwner(String ownerName) {
         List<Product> productList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_OWNER + " = ?";
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, new String[]{ownerName});
-
         if (cursor.moveToFirst()) {
             do {
                 productList.add(extractProduct(cursor));
@@ -97,14 +103,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return productList;
     }
 
-    // Lấy danh sách sản phẩm ĐÃ DUYỆT
     public List<Product> getAllApprovedProducts() {
         List<Product> productList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = 'approved'";
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-
         if (cursor.moveToFirst()) {
             do {
                 productList.add(extractProduct(cursor));
@@ -115,14 +118,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return productList;
     }
 
-    // Lấy sản phẩm CHỜ DUYỆT (Pending)
     public List<Product> getPendingProducts() {
         List<Product> productList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_STATUS + " = 'pending'";
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-
         if (cursor.moveToFirst()) {
             do {
                 productList.add(extractProduct(cursor));
@@ -133,31 +133,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return productList;
     }
 
-    // Duyệt sản phẩm
     public void approveProduct(int productId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_STATUS, "approved");
-        
         db.update(TABLE_PRODUCTS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(productId)});
         db.close();
     }
 
-    // Xóa sản phẩm
     public void deleteProduct(int productId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_PRODUCTS, COLUMN_ID + " = ?", new String[]{String.valueOf(productId)});
         db.close();
     }
 
-    // Lấy sản phẩm theo danh mục và ĐÃ DUYỆT
     public List<Product> getApprovedProductsByCategory(String categoryFilter) {
         List<Product> productList = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_PRODUCTS + " WHERE " + COLUMN_CATEGORY + " = ? AND " + COLUMN_STATUS + " = 'approved'";
-
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, new String[]{categoryFilter});
-
         if (cursor.moveToFirst()) {
             do {
                 productList.add(extractProduct(cursor));
@@ -166,16 +160,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return productList;
-    }
-
-    public void createDefaultDataIfEmpty() {
-        if (getAllApprovedProducts().isEmpty()) {
-            addProduct(new Product("iPhone 14", "$999", R.drawable.ic_launcher_background, "Electronics", "approved", "admin", 10));
-            addProduct(new Product("Áo thun", "$20", R.drawable.ic_launcher_background, "Personal Items", "approved", "admin", 10));
-            addProduct(new Product("Sách Java", "$30", R.drawable.ic_launcher_background, "Books", "approved", "admin", 10));
-            addProduct(new Product("MacBook Pro", "$2000", R.drawable.ic_launcher_background, "Electronics", "approved", "admin", 10));
-            addProduct(new Product("Giày Nike", "$100", R.drawable.ic_launcher_background, "Personal Items", "approved", "admin", 10));
-            addProduct(new Product("Truyện Harry Potter", "$15", R.drawable.ic_launcher_background, "Books", "approved", "admin", 10));
-        }
     }
 }

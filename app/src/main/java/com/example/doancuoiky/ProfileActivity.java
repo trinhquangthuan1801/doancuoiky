@@ -1,6 +1,7 @@
 package com.example.doancuoiky;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -18,12 +19,10 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Lấy role và username
-        currentRole = getIntent().getStringExtra("ROLE");
-        currentUsername = getIntent().getStringExtra("USERNAME");
-        
-        if (currentRole == null) currentRole = "user";
-        if (currentUsername == null) currentUsername = "guest";
+        // --- LẤY DỮ LIỆU TỪ SHAREDPREFERENCES ---
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        currentRole = prefs.getString("user_role", "user");
+        currentUsername = prefs.getString("user_name", "guest");
 
         // Cập nhật tên hiển thị trên Profile
         TextView tvName = findViewById(R.id.tvName);
@@ -40,38 +39,31 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             llApproveProducts.setVisibility(View.GONE);
         }
-        
+
         // Xử lý click "Sản phẩm của tôi"
         LinearLayout llMyProducts = findViewById(R.id.llMyProducts);
         llMyProducts.setOnClickListener(v -> {
+            // MyProductsActivity giờ đã tự lấy username, không cần truyền qua Intent nữa
             Intent intent = new Intent(ProfileActivity.this, MyProductsActivity.class);
-            intent.putExtra("USERNAME", currentUsername);
             startActivity(intent);
         });
 
-        // Bottom Navigation logic
+        // Bottom Navigation logic (đã được dọn dẹp)
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
         bottomNav.setSelectedItemId(R.id.navigation_profile);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.navigation_home) {
-                Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
-                intent.putExtra("ROLE", currentRole);
-                intent.putExtra("USERNAME", currentUsername);
-                startActivity(intent);
+                startActivity(new Intent(ProfileActivity.this, MainActivity.class));
                 finish();
                 return true;
             } else if (itemId == R.id.navigation_sell) {
-                Intent intent = new Intent(ProfileActivity.this, SellActivity.class);
-                intent.putExtra("ROLE", currentRole);
-                intent.putExtra("USERNAME", currentUsername);
-                startActivity(intent);
+                startActivity(new Intent(ProfileActivity.this, SellActivity.class));
                 finish();
                 return true;
-            } else if (itemId == R.id.navigation_chat) { // THÊM XỬ LÝ CHO CHAT
-                Intent intent = new Intent(ProfileActivity.this, ChatActivity.class);
-                startActivity(intent);
+            } else if (itemId == R.id.navigation_chat) {
+                startActivity(new Intent(ProfileActivity.this, ChatActivity.class));
                 finish();
                 return true;
             } else if (itemId == R.id.navigation_profile) {
@@ -83,6 +75,11 @@ public class ProfileActivity extends AppCompatActivity {
         // Logout logic
         LinearLayout llLogout = findViewById(R.id.llLogout);
         llLogout.setOnClickListener(v -> {
+            // Xóa SharedPreferences khi đăng xuất
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
+            editor.apply();
+
             Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

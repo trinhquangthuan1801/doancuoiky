@@ -1,10 +1,9 @@
 package com.example.doancuoiky;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Product> productList;
     private DatabaseHelper dbHelper;
     private ChipGroup chipGroup;
-    private String currentRole; 
+    private String currentRole;
     private String currentUsername;
     private ImageView ivNotification;
 
@@ -29,29 +28,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Lấy role và username từ Intent
-        currentRole = getIntent().getStringExtra("ROLE");
-        currentUsername = getIntent().getStringExtra("USERNAME");
+        // --- QUẢN LÝ PHIÊN LÀM VIỆC BẰNG SHAREDPREFERENCES ---
+        Intent intent = getIntent();
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        if (intent.hasExtra("ROLE") && intent.hasExtra("USERNAME")) {
+            currentRole = intent.getStringExtra("ROLE");
+            currentUsername = intent.getStringExtra("USERNAME");
 
-        if (currentRole == null) {
-            currentRole = "user";
-        }
-        if (currentUsername == null) {
-            currentUsername = "guest";
+            // Lưu ngay vào SharedPreferences để dùng cho toàn bộ phiên làm việc
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("user_role", currentRole);
+            editor.putString("user_name", currentUsername);
+            editor.apply();
+        } else {
+            // Nếu không có intent (vd: quay lại từ màn hình khác), đọc từ SharedPreferences
+            currentRole = prefs.getString("user_role", "user");
+            currentUsername = prefs.getString("user_name", "guest");
         }
 
         // Ánh xạ icon chuông và cài đặt sự kiện click
         ivNotification = findViewById(R.id.ivNotification);
         ivNotification.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
-            startActivity(intent);
+            Intent notificationIntent = new Intent(MainActivity.this, NotificationActivity.class);
+            startActivity(notificationIntent);
         });
 
         // Khởi tạo DatabaseHelper
         dbHelper = new DatabaseHelper(this);
-        
-        // Tạo dữ liệu mẫu nếu database rỗng (chạy lần đầu)
-        dbHelper.createDefaultDataIfEmpty();
+        // Dòng lỗi `createDefaultDataIfEmpty()` đã được xóa bỏ.
 
         // Khởi tạo RecyclerView
         rvProducts = findViewById(R.id.rvProducts);
@@ -85,23 +89,20 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
+            // Không cần truyền ROLE và USERNAME nữa vì các Activity khác có thể tự đọc từ SharedPreferences
             if (itemId == R.id.navigation_sell) {
-                Intent intent = new Intent(MainActivity.this, SellActivity.class);
-                intent.putExtra("ROLE", currentRole); 
-                intent.putExtra("USERNAME", currentUsername);
-                startActivity(intent);
+                Intent sellIntent = new Intent(MainActivity.this, SellActivity.class);
+                startActivity(sellIntent);
                 return true;
             } else if (itemId == R.id.navigation_home) {
                 return true;
-            } else if (itemId == R.id.navigation_chat) { // THÊM XỬ LÝ CHO CHAT
-                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                startActivity(intent);
+            } else if (itemId == R.id.navigation_chat) {
+                Intent chatIntent = new Intent(MainActivity.this, ChatActivity.class);
+                startActivity(chatIntent);
                 return true;
             } else if (itemId == R.id.navigation_profile) {
-                Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
-                intent.putExtra("ROLE", currentRole); 
-                intent.putExtra("USERNAME", currentUsername); 
-                startActivity(intent);
+                Intent profileIntent = new Intent(MainActivity.this, ProfileActivity.class);
+                startActivity(profileIntent);
                 return true;
             }
             return false;
@@ -111,16 +112,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        List<Integer> checkedIds = chipGroup.getCheckedChipIds();
-        if (checkedIds.isEmpty()) {
-             loadProducts();
-        } else {
-            int checkedId = checkedIds.get(0);
-             if (checkedId == R.id.chipAll) loadProducts();
-             else if (checkedId == R.id.chipElectronics) loadProductsByCategory("Electronics");
-             else if (checkedId == R.id.chipClothes) loadProductsByCategory("Personal Items");
-             else if (checkedId == R.id.chipBooks) loadProductsByCategory("Books");
-        }
+        // Tải lại sản phẩm khi quay lại màn hình này để cập nhật dữ liệu mới nhất
+        loadProductsBasedOnChipSelection();
     }
 
     private void loadProducts() {
@@ -136,5 +129,21 @@ public class MainActivity extends AppCompatActivity {
     private void updateAdapter() {
         productAdapter = new ProductAdapter(productList);
         rvProducts.setAdapter(productAdapter);
+    }
+
+    private void loadProductsBasedOnChipSelection(){
+        List<Integer> checkedIds = chipGroup.getCheckedChipIds();
+        if (checkedIds.isEmpty() || checkedIds.get(0) == R.id.chipAll) {
+            loadProducts();
+        } else {
+            int checkedId = checkedIds.get(0);
+            if (checkedId == R.id.chipElectronics) {
+                loadProductsByCategory("Electronics");
+            } else if (checkedId == R.id.chipClothes) {
+                loadProductsByCategory("Personal Items");
+            } else if (checkedId == R.id.chipBooks) {
+                loadProductsByCategory("Books");
+            }
+        }
     }
 }

@@ -84,12 +84,13 @@
                     android:text="Category: Electronics"
                     android:textColor="#888888"
                     android:layout_marginTop="8dp"/>
-                
+
+                <!-- Thêm TextView cho người bán -->
                 <TextView
-                    android:id="@+id/tvDetailQuantity"
+                    android:id="@+id/tvDetailOwner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Số lượng: 10"
+                    android:text="Người bán: admin"
                     android:textColor="#888888"
                     android:layout_marginTop="4dp"/>
 

@@ -1,5 +1,6 @@
 package com.example.doancuoiky;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -22,10 +23,12 @@ public class MyProductsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_products);
 
-        // Lấy username từ Intent
-        currentUsername = getIntent().getStringExtra("USERNAME");
+        // --- LẤY USERNAME TỪ SHAREDPREFERENCES (cách làm đúng) ---
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        currentUsername = prefs.getString("user_name", null);
+
         if (currentUsername == null) {
-            Toast.makeText(this, "Lỗi xác thực người dùng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi: không xác thực được người dùng. Vui lòng đăng nhập lại.", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -41,8 +44,16 @@ public class MyProductsActivity extends AppCompatActivity {
     }
 
     private void loadMyProducts() {
+        // Luôn lấy sản phẩm của người dùng đang đăng nhập
         myProductList = dbHelper.getProductsByOwner(currentUsername);
         adapter = new MyProductAdapter(myProductList);
         rvMyProducts.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Tải lại danh sách khi quay lại màn hình
+        loadMyProducts();
     }
 }
