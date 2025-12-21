@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private String currentRole;
     private String currentUsername;
     private ImageView ivNotification;
+    private ImageView ivCart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +47,22 @@ public class MainActivity extends AppCompatActivity {
             currentUsername = prefs.getString("user_name", "guest");
         }
 
-        // Ánh xạ icon chuông và cài đặt sự kiện click
+        // Ánh xạ icon chuông và giỏ hàng
         ivNotification = findViewById(R.id.ivNotification);
+        ivCart = findViewById(R.id.ivCart);
+
         ivNotification.setOnClickListener(v -> {
             Intent notificationIntent = new Intent(MainActivity.this, NotificationActivity.class);
             startActivity(notificationIntent);
         });
 
+        ivCart.setOnClickListener(v -> {
+            Intent cartIntent = new Intent(MainActivity.this, CartActivity.class);
+            startActivity(cartIntent);
+        });
+
         // Khởi tạo DatabaseHelper
         dbHelper = new DatabaseHelper(this);
-        // Dòng lỗi `createDefaultDataIfEmpty()` đã được xóa bỏ.
 
         // Khởi tạo RecyclerView
         rvProducts = findViewById(R.id.rvProducts);
@@ -89,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            // Không cần truyền ROLE và USERNAME nữa vì các Activity khác có thể tự đọc từ SharedPreferences
             if (itemId == R.id.navigation_sell) {
                 Intent sellIntent = new Intent(MainActivity.this, SellActivity.class);
                 startActivity(sellIntent);
@@ -112,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Tải lại sản phẩm khi quay lại màn hình này để cập nhật dữ liệu mới nhất
         loadProductsBasedOnChipSelection();
     }
 
