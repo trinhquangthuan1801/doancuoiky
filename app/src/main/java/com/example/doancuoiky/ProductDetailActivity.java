@@ -49,7 +49,12 @@ public class ProductDetailActivity extends AppCompatActivity {
         // SỬA LẠI NÚT MUA NGAY
         btnBuyNow.setOnClickListener(v -> {
             Intent intent = new Intent(ProductDetailActivity.this, CheckoutActivity.class);
-            // Chúng ta sẽ truyền dữ liệu sản phẩm qua intent ở bước sau
+            
+            // **BƯỚC 5.1: GÓI DỮ LIỆU VÀO INTENT**
+            intent.putExtra("PRODUCT_NAME", name);
+            intent.putExtra("PRODUCT_PRICE", price);
+            intent.putExtra("PRODUCT_IMAGE", imageRes);
+
             startActivity(intent);
         });
     }
