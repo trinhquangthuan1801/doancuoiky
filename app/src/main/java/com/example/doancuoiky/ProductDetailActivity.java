@@ -1,5 +1,6 @@
 package com.example.doancuoiky;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -36,8 +37,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         tvDetailName.setText(name != null ? name : "N/A");
         tvDetailPrice.setText(price != null ? price : "$0");
         tvDetailCategory.setText(String.format("Category: %s", category != null ? category : "N/A"));
-        
-        // SỬA LỖI TRIỆT ĐỂ: Dùng String.format() để tránh crash
         tvDetailQuantity.setText(String.format("Số lượng: %d", quantity));
 
         // Xử lý sự kiện
@@ -47,8 +46,11 @@ public class ProductDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Đã thêm vào giỏ hàng!", Toast.LENGTH_SHORT).show();
         });
 
+        // SỬA LẠI NÚT MUA NGAY
         btnBuyNow.setOnClickListener(v -> {
-            Toast.makeText(this, "Chức năng mua hàng đang phát triển!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ProductDetailActivity.this, CheckoutActivity.class);
+            // Chúng ta sẽ truyền dữ liệu sản phẩm qua intent ở bước sau
+            startActivity(intent);
         });
     }
 }

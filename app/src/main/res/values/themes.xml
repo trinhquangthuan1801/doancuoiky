@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.Doancuoiky" parent="Base.Theme.Doancuoiky" />
+
+    <!-- Thêm Theme cho CheckoutActivity -->
+    <style name="Theme.Doancuoiky.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 </resources>
