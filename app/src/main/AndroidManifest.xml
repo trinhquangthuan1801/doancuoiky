@@ -13,71 +13,60 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Doancuoiky">
-
+        <activity
+            android:name=".ChatDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".CheckoutActivity"
             android:exported="false"
             android:theme="@style/Theme.Doancuoiky.NoActionBar" />
-
         <activity
             android:name=".CartActivity"
             android:exported="false" />
-
         <activity
             android:name=".PurchaseHistoryActivity"
             android:exported="false"
             android:theme="@style/Theme.Doancuoiky.NoActionBar" />
-
         <activity
             android:name=".SalesHistoryActivity"
             android:exported="false"
             android:theme="@style/Theme.Doancuoiky.NoActionBar" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-
         <activity
             android:name=".SignUpActivity"
             android:exported="true" />
-
         <activity
             android:name=".SellActivity"
             android:exported="true" />
-
         <activity
             android:name=".ProfileActivity"
             android:exported="true" />
-
         <activity
             android:name=".PendingProductsActivity"
             android:exported="true" />
-
         <activity
             android:name=".MyProductsActivity"
             android:exported="true" />
-
         <activity
             android:name=".ProductDetailActivity"
             android:exported="true" />
-
         <activity
             android:name=".NotificationActivity"
             android:exported="true" />
-
         <activity
             android:name=".ChatActivity"
             android:exported="true" />
-
     </application>
 
 </manifest>

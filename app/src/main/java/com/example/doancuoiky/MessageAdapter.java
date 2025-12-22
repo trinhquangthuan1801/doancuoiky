@@ -5,28 +5,40 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;import java.util.List;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
 
-public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.MessageViewHolder> {
+// Đặt tên là MessageAdapter để phân biệt với ChatAdapter (danh sách chat)
+public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageViewHolder> {
 
-    private List<SingleMessage> messageList;
+    private final List<Message> messageList;
 
-    public ConversationAdapter(List<SingleMessage> messageList) {
+    private static final int VIEW_TYPE_SENT = 1;
+    private static final int VIEW_TYPE_RECEIVED = 2;
+
+    public MessageAdapter(List<Message> messageList) {
         this.messageList = messageList;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return messageList.get(position).getType();
+        Message message = messageList.get(position);
+        if (message.isSentByCurrentUser()) {
+            return VIEW_TYPE_SENT;
+        } else {
+            return VIEW_TYPE_RECEIVED;
+        }
     }
 
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        if (viewType == SingleMessage.TYPE_SENT) {
+        if (viewType == VIEW_TYPE_SENT) {
+            // Dùng layout item_message_sent đã có
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_sent, parent, false);
         } else {
+            // Dùng layout item_message_received đã có
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message_received, parent, false);
         }
         return new MessageViewHolder(view);
@@ -34,8 +46,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
-        SingleMessage message = messageList.get(position);
-        holder.messageContent.setText(message.getContent());
+        Message message = messageList.get(position);
+        holder.messageText.setText(message.getText());
     }
 
     @Override
@@ -44,12 +56,12 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     }
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
-        TextView messageContent;
+        TextView messageText;
 
         public MessageViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Sửa lỗi ở dòng này: ID đúng là "message_text"
-            messageContent = itemView.findViewById(R.id.message_text);
+            // Ánh xạ TextView từ file layout (cả sent và received đều có id là message_text)
+            messageText = itemView.findViewById(R.id.message_text);
         }
     }
 }
