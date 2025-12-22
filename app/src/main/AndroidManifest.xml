@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Yêu cầu quyền đọc bộ nhớ ngoài -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
@@ -15,16 +14,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Doancuoiky">
 
-        <!-- Activity Màn hình Thanh toán -->
         <activity
             android:name=".CheckoutActivity"
             android:exported="false"
             android:theme="@style/Theme.Doancuoiky.NoActionBar" />
 
-        <!-- Activity Giỏ hàng -->
         <activity
             android:name=".CartActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".PurchaseHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Doancuoiky.NoActionBar" />
+
+        <activity
+            android:name=".SalesHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Doancuoiky.NoActionBar" />
 
         <activity
             android:name=".LoginActivity"
@@ -34,33 +41,43 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+
         <activity
             android:name=".SignUpActivity"
             android:exported="true" />
+
         <activity
             android:name=".SellActivity"
             android:exported="true" />
+
         <activity
             android:name=".ProfileActivity"
             android:exported="true" />
+
         <activity
             android:name=".PendingProductsActivity"
             android:exported="true" />
+
         <activity
             android:name=".MyProductsActivity"
             android:exported="true" />
+
         <activity
             android:name=".ProductDetailActivity"
             android:exported="true" />
+
         <activity
             android:name=".NotificationActivity"
             android:exported="true" />
+
         <activity
             android:name=".ChatActivity"
             android:exported="true" />
+
     </application>
 
 </manifest>
