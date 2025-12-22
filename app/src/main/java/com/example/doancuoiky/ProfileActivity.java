@@ -40,20 +40,20 @@ public class ProfileActivity extends AppCompatActivity {
             llApproveProducts.setVisibility(View.GONE);
         }
 
-        // --- XỬ LÝ SỰ KIỆN CHO CÁC MỤC MỚI ---
+        // --- KẾT NỐI CÁC MÀN HÌNH LỊCH SỬ ---
 
         // 1. Lịch sử mua hàng
         LinearLayout llPurchaseHistory = findViewById(R.id.llPurchaseHistory);
         llPurchaseHistory.setOnClickListener(v -> {
-            // TODO: Mở màn hình Lịch sử mua hàng sau khi tạo
-            Toast.makeText(ProfileActivity.this, "Chức năng Lịch sử mua hàng đang phát triển!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ProfileActivity.this, PurchaseHistoryActivity.class);
+            startActivity(intent);
         });
 
         // 2. Lịch sử bán hàng
         LinearLayout llSalesHistory = findViewById(R.id.llSalesHistory);
         llSalesHistory.setOnClickListener(v -> {
-            // TODO: Mở màn hình Lịch sử bán hàng sau khi tạo
-            Toast.makeText(ProfileActivity.this, "Chức năng Lịch sử bán hàng đang phát triển!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ProfileActivity.this, SalesHistoryActivity.class);
+            startActivity(intent);
         });
 
         // 3. Sản phẩm của tôi
