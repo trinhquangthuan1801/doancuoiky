@@ -1,5 +1,6 @@
 package com.example.doancuoiky;
 
+import android.content.Context;import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,16 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             senderName = itemView.findViewById(R.id.tvSenderName);
             lastMessage = itemView.findViewById(R.id.tvLastMessage);
             timestamp = itemView.findViewById(R.id.tvTimestamp);
+
+            // Đoạn code xử lý sự kiện click đã được thêm vào đây
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, ChatDetailActivity.class);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 }
