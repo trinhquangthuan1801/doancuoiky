@@ -36,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
                 loginSuccess("admin", username);
             } else if (username.equals("user") && password.equals("123")) {
                 loginSuccess("user", username);
+            } else if (username.equals("user1") && password.equals("123")) {
+                loginSuccess("user", username);
             } else {
                 Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
             }
@@ -51,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, "Login successful as " + role, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         intent.putExtra("ROLE", role);
-        intent.putExtra("USERNAME", username); // Truyền username sang MainActivity
+        intent.putExtra("USERNAME", username);
         startActivity(intent);
         finish();
     }
